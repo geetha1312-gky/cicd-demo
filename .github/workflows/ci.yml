@@ -102,14 +102,39 @@ jobs:
         run: docker push ghcr.io/geetha1312-gky/cicd-demo:latest
 
 
-  verify:
-    name: 🔍 Verify
-    runs-on: ubuntu-latest
+  deploy:
+    name: ☸️ Deploy
+    runs-on: self-hosted
     needs: docker
 
     steps:
-      - name: Verify Docker image
-        run: echo "Docker image successfully pushed to GHCR."
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy application to Kubernetes
+        run: |
+          kubectl set image deployment/cicd-demo-deployment \
+            cicd-demo=ghcr.io/geetha1312-gky/cicd-demo:latest
+
+      - name: Wait for deployment
+        run: |
+          kubectl rollout status deployment/cicd-demo-deployment
+
+
+  verify:
+    name: 🔍 Verify
+    runs-on: self-hosted
+    needs: deploy
+
+    steps:
+      - name: Check Kubernetes deployment
+        run: |
+          kubectl get deployment cicd-demo-deployment
+          kubectl get pods
+
+      - name: Verify application
+        run: |
+          kubectl get pods -l app=cicd-demo
 
       - name: Success message
-        run: echo "✅ CI pipeline completed successfully!"
+        run: echo "✅ CI/CD pipeline completed successfully!"
