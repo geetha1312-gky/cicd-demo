@@ -112,13 +112,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy application to Kubernetes
-        run: |
-          kubectl set image deployment/cicd-demo-deployment \
-            cicd-demo=ghcr.io/geetha1312-gky/cicd-demo:latest
+        run: kubectl set image deployment/cicd-demo-deployment cicd-demo=ghcr.io/geetha1312-gky/cicd-demo:latest
 
       - name: Wait for deployment
-        run: |
-          kubectl rollout status deployment/cicd-demo-deployment
+        run: kubectl rollout status deployment/cicd-demo-deployment
 
 
   verify:
@@ -133,8 +130,8 @@ jobs:
           kubectl get pods
 
       - name: Verify application
-        run: |
-          kubectl get pods -l app=cicd-demo
+        run: kubectl get pods -l app=cicd-demo
 
       - name: Success message
         run: echo "✅ CI/CD pipeline completed successfully!"
+
